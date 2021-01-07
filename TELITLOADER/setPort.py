@@ -99,7 +99,9 @@ def openSerial():
 	try:
 		telitPort = serial.Serial(PORT,BAUD,timeout=1,bytesize=8,\
 		stopbits=1,parity='N',writeTimeout=1)
-		telitPort.open()
+		# telitPort.open()
+		if (telitPort.isOpen() == False):
+			telitPort.open()
 	except serial.SerialException,e:
 		print "SERIAL FAILURE: ",e
 		print "CHECK settings.txt file"

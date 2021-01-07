@@ -81,6 +81,10 @@ enable:
 checkEnable:
 	@python TELITLOADER/enableCheck.py
 
+# Run Enabled Script
+run:
+	@python TELITLOADER/run.py
+
 help:
 	@echo -e "HELP:\n" \
 	"To use loader just type \"make\" and the command you want \n"\

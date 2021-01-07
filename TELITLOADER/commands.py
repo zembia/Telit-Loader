@@ -96,14 +96,16 @@ def writeFile():
 	print fileName
 	print fileLength
 
-	if int(fileLength)>7200:
-		print "#### FILE TOO BIG 7200 byte max #####"
+	if int(fileLength)>20000:
+		print "#### FILE TOO BIG 20000 byte max #####"
 		sys.exit(1)		
-	writeCommand= "AT#WSCRIPT=%s,%i\r\n" % (fileName,fileLength)
+	writeCommand= "AT#WSCRIPT=\"%s\",%i,0\r" % (fileName,fileLength)
 	print "Sending:" + writeCommand
 	setPort.serialOpenCheck()			#open serial connection send AT to check
 	setPort.telitPort.flushInput()			#get rid of junk
+	time.sleep(1)
 	setPort.telitPort.write(writeCommand)
+	time.sleep(1)
 	input = setPort.getReply()			#from setPort
 	if ">>>" not in input:
 		print "didn't get >>>??"
@@ -147,9 +149,9 @@ def deleteFile():
 	
 	setPort.serialOpenCheck()				#open serial connection send AT to check
 	deleteCommand= "AT#DSCRIPT=%s\r\n" % (fileName)
-	if ".py" in fileName:
-		print "\nDELETING .py file:"
-		#delete both files .py and .pyo
+	if ".pyc" in fileName:
+		print "\nDELETING file:"
+		#delete file
 		print "Sending: " + deleteCommand
 		setPort.telitPort.flush()
 		setPort.telitPort.write(deleteCommand)
@@ -159,25 +161,10 @@ def deleteFile():
 				print "FOUND AND DELETED:" +fileName
 				break	
 			elif "ERROR" in lines:
-				print "didn't find .py file: " +fileName
+				print "didn't find .pyc file: " +fileName
 				print lines
 				break
-		#delete .pyo
-		print "\nDELETING .pyo file:"
-		deleteCommand= "AT#DSCRIPT=%so\r\n" % (fileName) #add 'o' for pyo
-		print "Sending: " + deleteCommand
-		setPort.telitPort.flushInput()
-		setPort.telitPort.write(deleteCommand)
-		input = setPort.getReply()
-		for lines in input:
-			if "OK" in lines:
-				print "FOUND AND DELETED:" +fileName+"o"
-				break
-			elif "ERROR" in lines:
-				print "didn't find .pyo file: " +fileName
-				print lines
-				break
-	else:
+	elif ".py" in fileName:
 		print "\nDELETING file:"
 		#delete file
 		print "Sending: " + deleteCommand
@@ -192,6 +179,37 @@ def deleteFile():
 				print "didn't find .py file: " +fileName
 				print lines
 				break
+
+		# print "\nDELETING .py file:"
+		# #delete both files .py and .pyo
+		# print "Sending: " + deleteCommand
+		# setPort.telitPort.flush()
+		# setPort.telitPort.write(deleteCommand)
+		# input = setPort.getReply()
+		# for lines in input:
+		# 	if "OK" in lines:
+		# 		print "FOUND AND DELETED:" +fileName
+		# 		break	
+		# 	elif "ERROR" in lines:
+		# 		print "didn't find .py file: " +fileName
+		# 		print lines
+		# 		break
+		# #delete .pyo
+		# print "\nDELETING .pyc file:"
+		# deleteCommand= "AT#DSCRIPT=%sc\r\n" % (fileName) #add 'o' for pyo
+		# print "Sending: " + deleteCommand
+		# setPort.telitPort.flushInput()
+		# setPort.telitPort.write(deleteCommand)
+		# input = setPort.getReply()
+		# for lines in input:
+		# 	if "OK" in lines:
+		# 		print "FOUND AND DELETED:" +fileName+"c"
+		# 		break
+		# 	elif "ERROR" in lines:
+		# 		print "didn't find .pyc file: " +fileName
+		# 		print lines
+		# 		break
+	
 
 	setPort.serialClose()
 ########################################################################################
@@ -269,6 +287,25 @@ def enableScript():
 	setPort.serialClose()
 ############################################################################################
 
+
+#runScript##############################################################################
+def runScript():
+	global fileName
+	setPort.serialOpenCheck()			#open serial connection send AT to check
+	readCommand = "AT#EXECSCR\r\n" 
+	
+	print "Sending: " + readCommand
+	setPort.telitPort.flush()
+	setPort.telitPort.write(readCommand)
+	input = setPort.getReply()
+	print "STATUS:"
+	for line in input:
+		print line
+		if line == 'OK':
+			break
+	setPort.serialClose()
+############################################################################################
+
 #deleteAll##################################################################################
 def deleteAll():
 	global fileName 
@@ -322,7 +359,7 @@ def DELETEALL():
 ######writeFile()
 def WRITEFILE():
 	getFile()
-	deleteFile()
+	# deleteFile()
 	writeFile()
 ################
 
@@ -343,6 +380,9 @@ def ENABLESCRIPT():
 def CHECKENABLE():
 	enableScript()
 ###################
+
+def RUN():
+	runScript()
 
 
 
